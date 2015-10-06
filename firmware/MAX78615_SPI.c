@@ -6,9 +6,6 @@
 
 #define READ 0
 #define WRITE 1
-#define MISO 12
-#define MOSI 11
-#define CLK  13
 
 void send_control_byte(u8 additional_rw, u8 word_addr, u8 rw);
   u8 read_byte(void);
@@ -106,8 +103,7 @@ void MAX78615::write_registers(uint8_t addr, uint8_t to_write, uint32_t words[])
 
 void MAX78615::write_register(uint8_t addr, uint32_t a_word)
 {
-   uint8_t words_to_write = 1;
-   write_registers(addr, to_write, &a_word);
+   write_registers(addr, 1, &a_word);
    return;
 }
 
@@ -145,7 +141,7 @@ uint8_t void MAX78615::read_byte()
    return read;
 }
 
-void void MAX78615::write_byte(uint8_t byte) 
+void MAX78615::write_byte(uint8_t byte) 
 {
    SPI.transfer(byte);
 }
