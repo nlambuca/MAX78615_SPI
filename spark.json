@@ -1,0 +1,7 @@
+{
+  "name": "MAX78615_SPI",
+  "author": "NunoL",
+  "license": "Apache",
+  "version": "0.0.1",
+  "description": "SPI interface for Energy Measurement IC - 3Phase isolated"
+}
