@@ -1,90 +1,97 @@
+#include "MAX78615_LMU.h"
+//include register MAP
+#include "MAX78615_LMU_MAP.h"
+//include SPI driver
 #include <SPI.h>
 
-#include "MAX78615_LMU.h"
 #define READ 0
 #define WRITE 1
 #define MISO 12
 #define MOSI 11
 #define CLK  13
 
-#define CS_LOW() digitalWrite(cs, LOW)
-#define CS_HIGH() digitalWrite(cs, HIGH)
-#define SPI_XMIT(byte) SPI.transfer(byte)
- 
 void send_control_byte(u8 additional_rw, u8 word_addr, u8 rw);
   u8 read_byte(void);
 void write_byte(u8 byte);
 
-MAX78615_LMU::MAX78615_LMU() 
-{
-   int default_chip_sel = 7;
-   init(default_chip_sel); 
+MAX78615::MAX78615(uint8_t ss) 
+{ 
+  init(ss);
 }  
-
-MAX78615_LMU::MAX78615_LMU(int chip_sel) { init(chip_sel); }  
   
-void MAX78615_LMU::init(int cs)
+void MAX78615::init(uint8_t ss)
 {
-   this->cs = cs;
-   pinMode(cs, OUTPUT);
+   this->SS = ss;
+   pinMode(ss, OUTPUT);
    configure_spi();
    SPI.begin();
-   CS_HIGH();   
+   set_SS();
 }
 
-void MAX78615_LMU::configure_spi()
+void MAX78615::set_SS()
+{
+ digitalWrite(SS,1);
+}
+
+void MAX78615::rst_SS()
+{
+ digitalWrite(SS,0);
+}
+
+void MAX78615::configure_spi()
 {
    SPI.setBitOrder(MSBFIRST);
-   SPI.setClockDivider(SPI_CLOCK_DIV16);
+   SPI.setClockSpeed(1000000)); //1MHz max
    SPI.setDataMode(SPI_MODE3);
 }
 
-void MAX78615_LMU::read_registers(u8 word_addr, u8 words_to_read, u32 words[])
+void MAX78615::read_registers(uint8_t addr, uint8_t to_read, uint32_t words[])
 {
-   u8 additional_rw, i;
-   u8 * parts_of_word;
+   uint8_t additional_rw, i;
+   uint8_t * parts_of_word;
      
-   if (words_to_read < 1) return;
+   if (!words_to_read) //nothing to do here...
+    return;
    
-   CS_LOW();
+   rst_SS(); //select IC
    additional_rw = words_to_read - 1;
    send_control_byte(additional_rw, word_addr, READ);
    
    i = 0;
    while(words_to_read > 0)
    {
-      parts_of_word = (u8 *) (words + i);
+      parts_of_word = (uint8_t *) (words + i);
       parts_of_word[2] = read_byte();
       parts_of_word[1] = read_byte();
       parts_of_word[0] = read_byte();
       words_to_read--;
       i++;
    }
-   CS_HIGH();
+   set_SS();
 }
 
-u32 MAX78615_LMU::read_register(u8 word_addr)
+uint32_t MAX78615::read_register(uint8_t addr)
 {
-   u32 ret = 0;
-   read_registers(word_addr, 1, &ret);
+   uint32_t ret = 0;
+   read_registers(addr, 1, &ret);
    return ret;
 }
 
-void MAX78615_LMU::write_registers(u8 word_addr, u8 words_to_write, u32 words[])
+void MAX78615::write_registers(uint8_t addr, uint8_t to_write, uint32_t words[])
 {
-   u8 additional_rw, rw, i;
-   u8 * parts_of_word;
+   uint8_t additional_rw, rw, i;
+   uint8_t * parts_of_word;
    
-   if (words_to_write < 1) return;
+   if (!words_to_write) return; //nothing to do here
    
-   CS_LOW();
+   rst_SS();
    additional_rw = words_to_write - 1;
    send_control_byte(additional_rw, word_addr, WRITE);
    
    i = 0;
    while(words_to_write > 0)
    {
-      parts_of_word = (u8 *)(words + i);
+      parts_of_word = (uint8_t *)(words + i);
       //assume little endian
       //assume that the LSB starts at the lower offset
       write_byte(parts_of_word[2]);
@@ -93,24 +100,24 @@ void MAX78615_LMU::write_registers(u8 word_addr, u8 words_to_write, u32 words[])
       words_to_write--;
       i++;
    }
-   CS_HIGH();
+   set_SS();
    return;
 }
 
-void MAX78615_LMU::write_register(u8 word_addr, u32 a_word)
+void MAX78615::write_register(uint8_t addr, uint32_t a_word)
 {
-   u8 words_to_write = 1;
-   write_registers(word_addr, words_to_write, &a_word);
+   uint8_t words_to_write = 1;
+   write_registers(addr, to_write, &a_word);
    return;
 }
 
-void send_control_byte(u8 additional_rw, u8 word_addr, u8 rw)
+void void MAX78615::send_control_byte(uint8_t additional_rw, uint8_t word_addr, uint8_t rw)
 {
    //additional_rw means the number of additional reads or writes
    //you wish to perform after ONE mandatory read or write
    //after the control byte is sent
  
-   u8 NBRACC, ADDR_7_8, cntrl_byte_1, cntrl_byte_2;
+   uint8_t NBRACC, ADDR_7_8, cntrl_byte_1, cntrl_byte_2;
    
    //Format the first Control Byte, see pg 53 of the 
    //MAX78615+LMU Datasheet
@@ -132,13 +139,13 @@ void send_control_byte(u8 additional_rw, u8 word_addr, u8 rw)
    return;   
 }
  
-u8 read_byte() 
+uint8_t void MAX78615::read_byte() 
 {
-   u8 read = SPI_XMIT(0x00);
+   uint8_t read = SPI.transfer(0x00);
    return read;
 }
 
-void write_byte(u8 byte) 
+void void MAX78615::write_byte(uint8_t byte) 
 {
-   SPI_XMIT(byte);
+   SPI.transfer(byte);
 }
