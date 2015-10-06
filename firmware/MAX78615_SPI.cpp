@@ -1,6 +1,6 @@
 #include "MAX78615_SPI.h"
 //include register MAP
-#include "MAX78615_LMU_MAP.h"
+//#include "MAX78615_LMU_MAP.h"
 //include SPI driver
 #include <SPI.h>
 
