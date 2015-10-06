@@ -1,5 +1,5 @@
-#ifndef _MAX78615
-#define _MAX78615
+#ifndef __MAX78615__
+#define __MAX78615__
 
 class MAX78615
 {
