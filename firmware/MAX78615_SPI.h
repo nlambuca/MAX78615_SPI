@@ -4,7 +4,7 @@
 class MAX78615
 {
    public:
-      MAX78615_LMU(uint8_t);      
+      MAX78615(uint8_t);      
       
       void write_registers(utin8_t, uint8_t , uint32_t words[]);
       void write_register(uint8_t, uint32_t );
