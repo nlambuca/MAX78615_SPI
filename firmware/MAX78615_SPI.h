@@ -15,7 +15,7 @@ class MAX78615
       //-1MHZ max
       //-MODE 3
    private:
-      uint8_t  SS;
+      uint8_t  ChipS;
       void init(uint8_t ss);
       void send_control_byte(uint8_t, uint8_t, uint8_t );
       void writebyte(uint8_t);
