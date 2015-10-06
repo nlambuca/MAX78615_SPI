@@ -6,7 +6,7 @@ class MAX78615
    public:
       MAX78615(uint8_t);      
       
-      void write_registers(utin8_t, uint8_t , uint32_t words[]);
+      void write_registers(uint8_t, uint8_t , uint32_t words[]);
       void write_register(uint8_t, uint32_t );
       void read_registers(uint8_t, uint8_t to_read, uint32_t words[]);
       uint32_t read_register(uint8_t);
