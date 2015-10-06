@@ -7,10 +7,6 @@
 #define READ 0
 #define WRITE 1
 
-void send_control_byte(u8 additional_rw, u8 word_addr, u8 rw);
-  u8 read_byte(void);
-void write_byte(u8 byte);
-
 MAX78615::MAX78615(uint8_t ss) 
 { 
   init(ss);
