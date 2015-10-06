@@ -14,8 +14,8 @@ MAX78615::MAX78615(uint8_t ss)
   
 void MAX78615::init(uint8_t ss)
 {
-   this->SS = ss;
-   pinMode(ss, OUTPUT);
+   this->ChipS = ss;
+   pinMode(ChipS, OUTPUT);
    configure_spi();
    SPI.begin();
    set_SS();
@@ -23,12 +23,12 @@ void MAX78615::init(uint8_t ss)
 
 void MAX78615::set_SS()
 {
- digitalWrite(SS,1);
+ digitalWrite(ChipS,1);
 }
 
 void MAX78615::rst_SS()
 {
- digitalWrite(SS,0);
+ digitalWrite(ChipS,0);
 }
 
 void MAX78615::configure_spi()
